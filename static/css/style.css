@@ -1,0 +1,51 @@
+/* static/css/style.css */
+
+/* Estilos gerais para corpo (se não estiverem no HTML) */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Estilo para a área de logs */
+.log-container {
+    border: 1px solid #ced4da;
+}
+
+/* Estilos específicos para os níveis de log */
+.log-info {
+    color: #004085; /* Azul escuro */
+}
+.log-warning {
+    color: #856404; /* Laranja escuro */
+}
+.log-error {
+    color: #721c24; /* Vermelho escuro */
+}
+.log-success {
+    color: #155724; /* Verde escuro */
+}
+
+.progress {
+            height: 1rem; /* Reduz a altura da barra */
+            font-size: 0.7rem; /* Reduz um pouco a fonte dentro da barra */
+        }
+
+/* Melhorias visuais para dropdowns em foco */
+.form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+/* Botões de etapa */
+.accordion-button {
+    font-size: 1.1rem;
+    padding: 1rem 1.25rem;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #0056b3; /* Tom mais escuro de azul para o cabeçalho ativo */
+}
+
+/* Ícones nos botões */
+.btn i {
+    margin-right: 0.5rem;
+}

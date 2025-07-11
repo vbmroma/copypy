@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador e Copiador de Arquivos v6</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif; /* Fonte mais moderna */
+            background-color: #eef2f6; /* Tom de azul claro para o fundo */
+            color: #34495e; /* Azul escuro para o texto principal */
+        }
+        .header {
+            background-color: #2c3e50; /* Azul escuro quase preto */
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15); /* Sombra mais pronunciada */
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem; /* Mais preenchimento */
+            border-radius: 1rem; /* Bordas mais arredondadas */
+            box-shadow: 0 0 20px rgba(0,0,0,0.08); /* Sombra mais suave */
+        }
+        .accordion-button {
+            font-weight: 600; /* Mais negrito */
+            color: #2c3e50; /* Cor do header para os botões */
+            background-color: #f0f4f7; /* Fundo suave */
+            border-radius: 0.75rem; /* Bordas arredondadas */
+            margin-bottom: 0.75rem;
+            padding: 1.25rem 1.5rem; /* Mais preenchimento */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .accordion-button:not(.collapsed) {
+            background-color: #3498db; /* Azul vibrante quando ativo */
+            color: white;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,.15);
+        }
+        .accordion-body {
+            padding: 2rem; /* Mais preenchimento */
+            background-color: #fcfdfe; /* Fundo quase branco */
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+            border: 1px solid #e0e6ed; /* Borda sutil */
+        }
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .btn-primary {
+            background-color: #3498db; /* Azul vibrante */
+            border-color: #3498db;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9; /* Azul mais escuro no hover */
+            border-color: #2980b9;
+        }
+        .btn-danger {
+            background-color: #e74c3c; /* Vermelho vibrante */
+            border-color: #e74c3c;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b; /* Vermelho mais escuro no hover */
+            border-color: #c0392b;
+        }
+        .btn-warning {
+            background-color: #f39c12; /* Laranja vibrante */
+            border-color: #f39c12;
+            color: white; /* Texto branco para contraste */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-warning:hover {
+            background-color: #e67e22; /* Laranja mais escuro */
+            border-color: #e67e22;
+        }
+        .btn-info {
+            background-color: #1abc9c; /* Verde água vibrante */
+            border-color: #1abc9c;
+            color: white; /* Texto branco para contraste */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-info:hover {
+            background-color: #16a085; /* Verde água mais escuro */
+            border-color: #16a085;
+        }
+
+        /* Correção da barra de progresso */
+        .progress-section {
+            background-color: #e0e6ed; /* Fundo suave para a seção de progresso */
+            padding: 1.8rem;
+            border-radius: 0.8rem;
+            margin-bottom: 2.5rem;
+            box-shadow: inset 0 0 12px rgba(0,0,0,0.04);
+        }
+        .progress {
+            height: 1.25rem; /* Ajuste a altura para algo que pareça bom (ex: 20px) */
+            font-size: 0.75rem; /* Tamanho da fonte dentro da barra */
+            border-radius: 0.5rem;
+            overflow: hidden; /* Garante que o texto não vaze se for grande */
+        }
+        .progress-bar {
+            transition: width 0.6s ease-in-out; /* Animação suave para o preenchimento */
+        }
+
+        .log-container {
+            max-height: 350px; /* Um pouco mais alto */
+            overflow-y: auto;
+            background-color: #f8f9fa; /* Fundo mais claro */
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            font-family: 'Consolas', 'Courier New', monospace; /* Fonte monoespaçada para logs */
+            font-size: 0.8rem;
+            color: #555;
+            border: 1px solid #e0e6ed;
+        }
+        .log-info { color: #3498db; } /* Cor dos botões primários */
+        .log-warning { color: #f39c12; } /* Cor do botão warning */
+        .log-error { color: #e74c3c; } /* Cor do botão danger */
+        .log-success { color: #27ae60; } /* Verde escuro para sucesso */
+        .log-debug { color: #7f8c8d; } /* Cinza para debug */
+
+        .alert-container {
+            position: fixed;
+            top: 1.5rem; /* Um pouco mais afastado do topo */
+            right: 1.5rem; /* Um pouco mais afastado da direita */
+            z-index: 1050;
+            max-width: 450px; /* Um pouco mais largo */
+        }
+        .alert {
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-out; /* Animação de entrada */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .list-group-item strong {
+            color: #3498db; /* Cor primária para tipo/status */
+        }
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; /* Para garantir que os itens se ajustem em telas pequenas */
+            gap: 0.75rem; /* Espaçamento entre os elementos */
+            padding: 0.75rem 1.25rem;
+        }
+        .list-group-item a.btn {
+            white-space: nowrap; /* Impede que os botões quebrem a linha */
+        }
+    </style>
+</head>
+<body>
+    <header class="header text-center">
+        <div class="container">
+            <h1 class="mb-0"><i class="fas fa-folder-tree me-3"></i>Comparador e Copiador de Arquivos</h1>
+            <p class="lead">Automatize a sincronização de pastas de forma eficiente e segura</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="progress-section mb-5">
+            <h4 class="mb-4 text-center">Monitoramento da Operação</h4>
+            <div class="row align-items-center mb-4">
+                <div class="col-md-7">
+                    <p class="mb-1"><strong>Status Atual:</strong> <span id="operationStatus">{{ operation_state.status_message }}</span></p>
+                    <p class="mb-1"><strong>Arquivos Processados:</strong> <span id="filesProcessed">{{ operation_state.files_processed }}</span> de <span id="totalFilesEstimated">{{ operation_state.total_files_estimated }}</span></p>
+                    <p class="mb-0"><strong>Diretório em Andamento:</strong> <span id="currentDirectory">{{ operation_state.current_directory }}</span></p>
+                </div>
+                <div class="col-md-5 text-end">
+                    <button id="pauseBtn" class="btn btn-warning btn-lg me-2" {{ 'disabled' if not operation_state.running or operation_state.paused }}>
+                        <i class="fas fa-pause me-1"></i> Pausar
+                    </button>
+                    <button id="resumeBtn" class="btn btn-info btn-lg me-2" {{ 'disabled' if not operation_state.running or not operation_state.paused }}>
+                        <i class="fas fa-play me-1"></i> Retomar
+                    </button>
+                    <button id="stopBtn" class="btn btn-danger btn-lg" {{ 'disabled' if not operation_state.running }}>
+                        <i class="fas fa-stop me-1"></i> Parar
+                    </button>
+                </div>
+            </div>
+            <div class="progress" role="progressbar" aria-label="Progresso da Operação" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div id="progressBar" class="progress-bar bg-primary" style="width: 0%">0%</div>
+            </div>
+        </div>
+
+        <div id="dynamicAlerts" class="alert-container"></div>
+
+        <div class="accordion" id="processAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <i class="fas fa-folder-open me-2"></i> **Etapa 1: Coletar Informações de Pastas**
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#processAccordion">
+                    <div class="accordion-body">
+                        <form id="collectionForm">
+                            <div class="mb-3">
+                                <label for="directoryPath" class="form-label">Caminho Completo da Pasta:</label>
+                                <input type="text" class="form-control" id="directoryPath" name="directory_path" placeholder="Ex: C:\MeusDocumentos\Origem" required>
+                                <div class="form-text">Insira o caminho absoluto da pasta para coleta de dados.</div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="collectionType" class="form-label">Propósito da Coleta:</label>
+                                <select class="form-select" id="collectionType" name="collection_type" required>
+                                    <option value="">-- Selecione o tipo de coleta --</option>
+                                    <option value="origem">Pasta de Origem (fonte dos arquivos)</option>
+                                    <option value="destino">Pasta de Destino (onde os arquivos serão copiados)</option>
+                                </select>
+                                <div class="form-text">Define o papel desta pasta na comparação futura.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="startCollectionBtn" {{ 'disabled' if operation_state.running }}>
+                                <i class="fas fa-play-circle me-2"></i> Iniciar Coleta de Dados
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        <i class="fas fa-exchange-alt me-2"></i> **Etapa 2: Comparar Pastas**
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#processAccordion">
+                    <div class="accordion-body">
+                        <form id="compareForm">
+                            <div class="mb-3">
+                                <label for="jsonOrigem" class="form-label">JSON de Coleta da Origem:</label>
+                                <select class="form-select" id="jsonOrigem" name="json_origem" required>
+                                    <option value="">-- Selecione um JSON de Origem --</option>
+                                    {% for json in collected_jsons %}
+                                        {% if json.collection_type == 'origem' %}
+                                            <option value="{{ json.filename }}" title="Caminho: {{ json.directory_path }} | Inacessíveis: {{ json.inaccessible_count }}">
+                                                {{ json.filename }} ({{ json.timestamp }} | {{ json.directory_path }})
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">O relatório da pasta que contém os arquivos que você quer verificar se existem no destino.</div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="jsonDestino" class="form-label">JSON de Coleta do Destino:</label>
+                                <select class="form-select" id="jsonDestino" name="json_destino" required>
+                                    <option value="">-- Selecione um JSON de Destino --</option>
+                                    {% for json in collected_jsons %}
+                                        {% if json.collection_type == 'destino' %}
+                                            <option value="{{ json.filename }}" title="Caminho: {{ json.directory_path }} | Inacessíveis: {{ json.inaccessible_count }}">
+                                                {{ json.filename }} ({{ json.timestamp }} | {{ json.directory_path }})
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">O relatório da pasta onde você quer verificar a existência ou diferenças dos arquivos da origem.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="startComparisonBtn" {{ 'disabled' if operation_state.running }}>
+                                <i class="fas fa-play-circle me-2"></i> Iniciar Comparação de Pastas
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        <i class="fas fa-copy me-2"></i> **Etapa 3: Copiar Arquivos Ausentes/Diferentes**
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#processAccordion">
+                    <div class="accordion-body">
+                        <form id="copyForm">
+                            <div class="mb-4">
+                                <label for="comparisonJsonForCopy" class="form-label">Relatório de Comparação para Cópia:</label>
+                                <select class="form-select" id="comparisonJsonForCopy" name="comparison_json" required>
+                                    <option value="">-- Selecione um relatório de comparação --</option>
+                                    {% for json in comparison_jsons %}
+                                        <option value="{{ json.filename }}" title="Origem: {{ json.dir_origem }} | Destino: {{ json.dir_destino }} | Arquivos a Copiar: {{ json.not_copied_count }}">
+                                            {{ json.filename }} ({{ json.not_copied_count }} arquivos para cópia) - {{ json.timestamp }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Este relatório guiará quais arquivos precisam ser copiados ou atualizados.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="startCopyBtn" {{ 'disabled' if operation_state.running }}>
+                                <i class="fas fa-play-circle me-2"></i> Iniciar Cópia de Arquivos
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        <i class="fas fa-file-alt me-2"></i> **Etapa 4: Visualizar e Gerenciar Relatórios**
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#processAccordion">
+                    <div class="accordion-body">
+                        <h5 class="mb-3 border-bottom pb-2">Relatórios de Coleta Disponíveis:</h5>
+                        <ul class="list-group mb-4" id="collectedJsonsList">
+                            {% if collected_jsons %}
+                                {% for json_file in collected_jsons %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('download_info_file', filename=json_file.filename) }}" download class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-download me-1"></i>JSON</a>
+                                        <span class="flex-grow-1">
+                                            <strong>{{ json_file.collection_type.capitalize() }}</strong> - {{ json_file.filename }} ({{ json_file.timestamp }})
+                                            <br><small class="text-muted">{{ json_file.directory_path }}</small>
+                                        </span>
+                                        {% if json_file.inaccessible_count > 0 %}
+                                            <span class="badge bg-warning text-dark ms-auto">Inacessíveis: {{ json_file.inaccessible_count }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item text-muted text-center">Nenhum relatório de coleta disponível ainda.</li>
+                            {% endif %}
+                        </ul>
+
+                        <h5 class="mb-3 border-bottom pb-2">Relatórios de Comparação Disponíveis:</h5>
+                        <ul class="list-group mb-4" id="comparisonJsonsList">
+                            {% if comparison_jsons %}
+                                {% for json_file in comparison_jsons %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('comparison_report', json_filename=json_file.filename) }}" target="_blank" class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-eye me-1"></i>Visualizar</a>
+                                        <a href="{{ url_for('download_file', filename=json_file.filename) }}" download class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-download me-1"></i>JSON</a>
+                                        {% set csv_filename = 'not_copied_comparison_' ~ (json_file.filename | replace('comparison_result_', '') | replace('.json', '.csv')) %}
+                                        {% if json_file.not_copied_count > 0 %}
+                                            <a href="{{ url_for('download_file', filename=csv_filename) }}" download class="btn btn-sm btn-outline-success"><i class="fas fa-file-csv me-1"></i>CSV</a>
+                                        {% endif %}
+                                        <span class="flex-grow-1 ms-3">
+                                            {{ json_file.filename }} ({{ json_file.timestamp }})
+                                            <br><small class="text-muted">Não Copiados: <strong>{{ json_file.not_copied_count }}</strong></small>
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item text-muted text-center">Nenhum relatório de comparação disponível ainda.</li>
+                            {% endif %}
+                        </ul>
+
+                        <h5 class="mb-3 border-bottom pb-2">Relatórios de Cópia Disponíveis:</h5>
+                        <ul class="list-group" id="copyReportsList">
+                            {% if copy_reports %}
+                                {% for report in copy_reports %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('copy_report', json_filename=report.filename) }}" target="_blank" class="btn btn-sm btn-outline-info me-2"><i class="fas fa-eye me-1"></i>Visualizar</a>
+                                        <a href="{{ url_for('download_file', filename=report.filename) }}" download class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-download me-1"></i>JSON</a>
+                                        {% set csv_filename = 'copy_failed_' ~ (report.filename | replace('copy_report_', '') | replace('.json', '.csv')) %}
+                                        {% if report.files_failed_to_copy > 0 %}
+                                            <a href="{{ url_for('download_file', filename=csv_filename) }}" download class="btn btn-sm btn-outline-warning"><i class="fas fa-file-csv me-1"></i>Falhas CSV</a>
+                                        {% endif %}
+                                        <span class="flex-grow-1 ms-3">
+                                            {{ report.filename }} ({{ report.timestamp }})
+                                            <br><small class="text-muted">Sucesso: <strong class="text-success">{{ report.files_copied_successfully }}</strong> | Falhas: <strong class="text-danger">{{ report.files_failed_to_copy }}</strong> de {{ report.total_files_attempted }}</small>
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item text-muted text-center">Nenhum relatório de cópia disponível ainda.</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="mt-5 mb-3 border-bottom pb-2">Logs da Aplicação</h4>
+        <div class="log-container" id="logMessages">
+            </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
