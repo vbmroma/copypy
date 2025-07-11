@@ -24,23 +24,6 @@ Gerenciamento de Relatórios: Baixe e visualize relatórios de coleta, comparaç
 
 Controle de Operação: Pause, retome ou pare operações em andamento.
 
-Estrutura do Projeto
-.
-├── app.py                     # Lógica principal do Flask, rotas e manipulação de arquivos
-├── templates/
-│   ├── index.html             # Interface web principal (HTML, CSS, Jinja2)
-│   └── comparison_report.html # Template para visualização de relatórios de comparação
-├── static/
-│   ├── js/
-│   │   └── main.js            # Lógica JavaScript para interatividade (AJAX, WebSockets)
-│   └── css/
-│       └── style.css          # (Opcional) CSS personalizado para estilos globais
-│   └── favicon.ico            # Ícone da aplicação
-├── collected_data/            # Diretório para armazenar relatórios de coleta
-├── comparison_results/        # Diretório para armazenar relatórios de comparação (JSON e CSV)
-├── copy_reports/              # Diretório para armazenar relatórios de cópia
-├── requirements.txt           # Dependências do Python
-└── README.md                  # Este arquivo
 Tecnologias Utilizadas
 Backend: Python 3, Flask
 
