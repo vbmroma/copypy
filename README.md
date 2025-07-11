@@ -1,3 +1,6 @@
+<img width="1272" height="826" alt="image" src="https://github.com/user-attachments/assets/f0857954-8978-444f-8629-fe398e3fd0f7" />
+
+
 Comparador e Copiador de Arquivos
 Este projeto Flask oferece uma interface web intuitiva para comparar e copiar arquivos entre diretórios locais. Ideal para sincronização de pastas, backup seletivo ou simplesmente para identificar diferenças entre duas estruturas de diretórios.
 
